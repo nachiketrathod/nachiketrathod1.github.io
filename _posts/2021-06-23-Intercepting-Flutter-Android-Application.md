@@ -56,6 +56,7 @@ As Flutter uses dart, Dart is not proxy aware and uses its own certificate store
 
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/1.png" alt="picture" alt="droidinfo" style="border:1px solid white" width="240" height="440">
+<figcaption>Fig 1. End users, Front-end and Back-end.</figcaption>
 </figure>
 
     Note:
@@ -67,6 +68,7 @@ As Flutter uses dart, Dart is not proxy aware and uses its own certificate store
 
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/2.jpg" alt="picture" alt="droidinfo" style="border:1px solid white" width="240" height="440">
+<figcaption>Fig 2. End users, Front-end and Back-end.</figcaption>
 </figure>
 
 
@@ -80,18 +82,21 @@ As Flutter uses dart, Dart is not proxy aware and uses its own certificate store
 
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/3.png" alt="picture" alt="droidinfo" style="border:1px solid white">
+<figcaption>Fig 3. End users, Front-end and Back-end.</figcaption>
 </figure>
 
 4.) After extracting the apk file, go to the `lib` folder.
 
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/4.png" alt="picture" alt="droidinfo" style="border:1px solid white">
+<figcaption>Fig 4. End users, Front-end and Back-end.</figcaption>
 </figure>
 
 5.) Now select the desired archicture that we have taken from **droid hardware info** app (arm64-v8). Now in your case these archicture folders may resides inside the `bin` folder.
 
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/5.png" alt="picture" alt="droidinfo" style="border:1px solid white">
+<figcaption>Fig 5. End users, Front-end and Back-end.</figcaption>
 </figure>
 
 6.) Once we move into desired CPU architecture folder(e.g here **arm64v8**) we can see the **libflutter.so**. This is the file that contains all the `functions` and `libraries` to call SSL pinning in the app according to CPU archicture.
@@ -99,18 +104,24 @@ As Flutter uses dart, Dart is not proxy aware and uses its own certificate store
 
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/6.png" alt="picture" alt="droidinfo" style="border:1px solid white">
+<figcaption>Fig 6. End users, Front-end and Back-end.</figcaption>
 </figure>
 
 7.) Set the Host to system Ip and port 8081 which is set as in `ProxyDroid`. also Identified SSL verification implemented using x509.cc. Run the application installed on the android device to capture the traffic and observe the burpsuite dashboard -> Event logs. We got TLS handshake error, Hence we can not intercept https traffic.
 
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/7.png" alt="picture" alt="droidinfo" style="border:1px solid white">
+<figcaption>Fig 7. End users, Front-end and Back-end.</figcaption>
 </figure>
+
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/8.png" alt="picture" alt="droidinfo" style="border:1px solid white">
+<figcaption>Fig 8. End users, Front-end and Back-end.</figcaption>
 </figure>
+
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/9.png" alt="picture" alt="droidinfo" style="border:1px solid white">
+<figcaption>Fig 9. End users, Front-end and Back-end.</figcaption>
 </figure>
 
 8.) Install Ghidra and dissemble the `libflutter.so` file.
@@ -119,6 +130,7 @@ Start Ghidra and drag and drop the Flutter file to it.
 
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/10.png" alt="picture" alt="droidinfo" style="border:1px solid white">
+<figcaption>Fig 10. End users, Front-end and Back-end.</figcaption>
 </figure>
 
     
@@ -126,42 +138,53 @@ Start Ghidra and drag and drop the Flutter file to it.
 
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/11.png" alt="picture" alt="droidinfo" style="border:1px solid white" width="1000">
+<figcaption>Fig 11. End users, Front-end and Back-end.</figcaption>
 </figure>
 
 + Now Once Analysis is completed search for the `strings` option.
 
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/12.png" alt="picture" alt="droidinfo" style="border:1px solid white" width="1000">
+<figcaption>Fig 12. End users, Front-end and Back-end.</figcaption>
 </figure>
 
 + Search for [`x509.cc`](https://github.com/google/boringssl/blob/master/ssl/ssl_x509.cc#L362) string in the binary, and we can see, we have got four XREF against the line.It’s pretty obvious that the ssl_x509.cc class has been compiled somewhere in the `0x650000` region, but that’s still a lot of functions to try to find the correct one. If searching for the filename doesn’t work, maybe searching for the line number would work.
 
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/13.png" alt="picture" alt="droidinfo" style="border:1px solid white" width="1000">
+<figcaption>Fig 13. End users, Front-end and Back-end.</figcaption>
 </figure>
 
 + Also perform the `Scalar search` for Magic number `0x186` To understand what is this magic number in details I suggest you should read this blog by nviso Team.
 
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/14.png" alt="picture" alt="droidinfo" style="border:1px solid white" width="1000">
+<figcaption>Fig 14. End users, Front-end and Back-end.</figcaption>
 </figure>
 
 + Map scalar search near to the x509.cc output and observe that one address we found in scalar search is in the range of the XREF[4] we got for x509.cc.
 
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/15.png" alt="picture" alt="droidinfo" style="border:1px solid white" width="1000">
+<figcaption>Fig 15. End users, Front-end and Back-end.</figcaption>
 </figure>
 
-+ now click on the following three heighlited parts. as we can see there so many `Locations` we have found in the scalar search but we choose the `0x65000` region because it has XREF[4] in [`x509.cc`](compare it with step 11 - XREF[4]).
++ now click on the following three heighlited parts. as we can see there so many `Locations` we have found in the scalar search but we choose the `0x65000` region because it has XREF[4] in [`x509.cc`].<br>
+
+```text
+Note: check the  XREF[4]  with step 11 
+```
 
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/16.png" alt="picture" alt="droidinfo" style="border:1px solid white" width="1000">
+<figcaption>Fig 16. End users, Front-end and Back-end.</figcaption>
 </figure>
 
 + Click on that address range `FUN_0065a4ec` and Observe the initial bytes value of `FUN_0065a4ec`. Copy some of those bytes:
 
 <figure  style="text-align: center;">
 <img src="/assets/blogs/Flutter/17.png" alt="picture" alt="droidinfo" style="border:1px solid white" width="1000">
+<figcaption>Fig 17. End users, Front-end and Back-end.</figcaption>
 </figure>
 
 + Copy the inital bytes as below and send to binwalk for offset count if needed.
