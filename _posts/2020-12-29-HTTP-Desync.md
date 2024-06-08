@@ -2,7 +2,7 @@
 title: HTTP request smuggling 
 date: 2020-12-29 09:45:47 +07:00
 modified: 2020-12-29 09:24:47 +07:00
-categories: [Sec-Blog]
+categories: [Sec-Blog, Web]
 tags: [Desync attack, Http request smuggling,Smuggling]
 ---
 
@@ -27,7 +27,7 @@ tags: [Desync attack, Http request smuggling,Smuggling]
 </p> --> 
 
 <h3 id="tldr"> 
-     <strong>TL;DR</strong>
+     <strong>TL;DR: </strong>
 </h3>
 
 In this blog we will discuss the `nitty-gritty` of the **HTTP request smuggling/HTTP Desync Attacks**.
