@@ -2,6 +2,7 @@
 title: HTTP request smuggling 
 date: 2020-12-29 09:45:47 +07:00
 modified: 2020-12-29 09:24:47 +07:00
+categories: [Sec-Blog]
 tags: [Desync attack, Http request smuggling,Smuggling]
 ---
 
